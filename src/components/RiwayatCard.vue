@@ -49,8 +49,8 @@
               <div>
                 <input
                   type="checkbox"
-                  id="pribadi"
-                  value="Pribadi"
+                  id="PRIBADI"
+                  value="PRIBADI"
                   v-model="selectedCategories"
                 />
                 <label for="pribadi">Pribadi</label>
@@ -84,30 +84,29 @@
           <thead>
             <tr>
               <th>Judul</th>
-              <th>Tanggal</th>
+              <th @click="sortBy('date')">Tanggal
+                <span class="material-icons sort-icon">
+                  {{ sortKey === 'date' ? (sortOrder === 'asc' ? 'arrow_drop_up' : 'arrow_drop_down') : 'swap_vert' }}
+                </span>
+              </th>
               <th>Jenis</th>
               <th>Kategori</th>
-              <th>Biaya</th>
-              <th>Status</th>
-              <th></th>
+              <th @click="sortBy('cost')">Biaya
+                <span class="material-icons sort-icon">
+                  {{ sortKey === 'cost' ? (sortOrder === 'asc' ? 'arrow_drop_up' : 'arrow_drop_down') : 'swap_vert' }}
+                </span>
+              </th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(item, index) in filteredTransactions"
-              :key="index"
-            >
+            <tr v-for="(item, index) in filteredTransactions" :key="index">
               <td>{{ item.title }}</td>
               <td>{{ item.date }}</td>
               <td>{{ item.type }}</td>
               <td>{{ item.category }}</td>
-              <td>{{ item.cost }}</td>
-              <td :class="{'status-approved': item.status === 'Setuju', 'status-rejected': item.status === 'Ditolak'}">
-                {{ item.status }}
-              </td>
-              <td>
-                <span class="material-icons more-icon">more_horiz</span>
-              </td>
+              <td>{{ formatRupiah(item.cost) }}</td> <!-- Format Rupiah -->
+              <td><span class="material-icons more-icon">more_horiz</span></td>
             </tr>
           </tbody>
         </table>
@@ -117,24 +116,51 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
 
-const transactions = ref([
-  { title: 'Makan Siang', date: '00/00/00', type: 'Non-Operational', category: 'Pribadi', cost: 'Rp.0,00', status: 'Ditolak' },
-  { title: 'Transportasi', date: '01/01/01', type: 'Operational', category: 'Listrik', cost: 'Rp.100,00', status: 'Setuju' },
-  { title: 'Gaji Karyawan', date: '02/02/02', type: 'Operational', category: 'Honor', cost: 'Rp.200,00', status: 'Setuju' },
-  { title: 'Tagihan Air', date: '03/03/03', type: 'Non-Operational', category: 'Air', cost: 'Rp.300,00', status: 'Setuju' },
-]);
+// Fungsi untuk memformat angka menjadi Rupiah
+function formatRupiah(value) {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(value);
+}
 
+// Data laporan transaksi
+const transactions = ref([]); // Inisialisasi dengan array kosong
+
+// State untuk pencarian dan filter
 const searchQuery = ref('');
 const selectedTypes = ref([]);
 const selectedCategories = ref([]);
 const showFilter = ref(false);
 
+// Fungsi untuk menampilkan atau menyembunyikan menu filter
 const toggleFilter = () => {
   showFilter.value = !showFilter.value;
 };
 
+// Fungsi untuk mengambil data laporan dari API
+const getExpenses = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/expenses'); // Mengambil data dari API
+    console.log('Data dari API:', response.data); // Log data dari API
+    transactions.value = response.data; // Mengisi `transactions` dengan data dari API
+  } catch (error) {
+    console.error('Error fetching expenses:', error);
+    alert('Terjadi kesalahan saat mengambil data laporan');
+  }
+};
+
+
+// Panggil API saat komponen di-mount
+onMounted(() => {
+  getExpenses(); // Ambil data ketika komponen selesai di-mount
+});
+
+// Filter data berdasarkan input pencarian dan kategori
 const filteredTransactions = computed(() => {
   return transactions.value.filter((transaction) => {
     const matchesSearchQuery = transaction.title
@@ -149,7 +175,39 @@ const filteredTransactions = computed(() => {
     return matchesSearchQuery && matchesType && matchesCategory;
   });
 });
+
+// State untuk sorting
+const sortKey = ref(null); // Menyimpan kolom yang sedang di-sort
+const sortOrder = ref('asc'); // Menyimpan urutan, bisa 'asc' atau 'desc'
+
+// Fungsi untuk sorting
+const sortBy = (key) => {
+  if (sortKey.value === key) {
+    // Jika sudah disortir dengan kunci ini, toggle order-nya
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    // Jika kunci sorting berubah, set sortKey baru dan reset order ke 'asc'
+    sortKey.value = key;
+    sortOrder.value = 'asc';
+  }
+
+  // Lakukan sorting berdasarkan kunci dan urutan yang dipilih
+  transactions.value.sort((a, b) => {
+    let result = 0;
+
+    // Sorting untuk angka (biaya)
+    if (key === 'cost') {
+      result = a.cost - b.cost;
+    } else if (key === 'date') {
+      // Sorting untuk tanggal
+      result = new Date(a.date) - new Date(b.date);
+    }
+
+    return sortOrder.value === 'asc' ? result : -result;
+  });
+}
 </script>
+
 
 <style scoped lang="scss">
 .table-card {
@@ -159,6 +217,8 @@ const filteredTransactions = computed(() => {
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+
 
   .card-header {
     display: flex;
@@ -239,6 +299,11 @@ const filteredTransactions = computed(() => {
       overflow-y: auto;
     }
 
+    .sort-icon{
+    color: var(--white);
+    
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -272,7 +337,7 @@ const filteredTransactions = computed(() => {
         color: var(--inactive);
         cursor: pointer;
         transition: 0.2s ease-out;
-        padding-left: 1.4rem;
+        padding-left: 0;
 
         &:hover {
           color: var(--grey);

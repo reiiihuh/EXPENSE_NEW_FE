@@ -26,7 +26,7 @@
               <span class="material-icons">payments</span>
               <span class="text">Detail Pengeluaran</span>
           </router-link>
-          <router-link class="button" to="/ReportManager">
+          <router-link v-if="userRole === 'BENDAHARA'" class="button" to="/ReportManager">
               <span class="material-icons">fact_check</span>
               <span class="text">Kelola Laporan</span>
           </router-link>
@@ -58,6 +58,7 @@
   
   const is_expanded = ref(false)
   const router = useRouter()
+  const userRole = ref(localStorage.getItem('role')); // Ambil role dari localStorage
   
   const ToggleMenu = () => {
       is_expanded.value = !is_expanded.value
@@ -66,7 +67,7 @@
   const handleLogout = async () => {
     try {
         const response = await fetch('http://localhost:5000/logout', {
-            method: 'POST',
+            method: 'DELETE',
             credentials: 'include',
         });
 

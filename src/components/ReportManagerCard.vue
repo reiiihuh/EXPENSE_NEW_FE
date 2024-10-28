@@ -11,6 +11,7 @@
             <th>Tanggal</th>
             <th>Jenis</th>
             <th>Pelapor</th>
+            <th>Biaya</th>
             <th>Status</th>
             <th>Aksi</th>
             <th>Keterangan</th>
@@ -26,6 +27,7 @@
             <td>{{ item.tanggal }}</td>
             <td>{{ item.jenis }}</td>
             <td>{{ item.pelapor }}</td>
+            <td>{{ item.biaya }}</td>
             <td>
               <span :class="statusClass(item.selectedAction)">
                 {{ item.status }}
@@ -74,6 +76,7 @@ export default {
           tanggal: '01/01/2024',
           jenis: 'Operasional',
           pelapor: 'Bendahara',
+          biaya: 'Rp.50.000',
           status: 'Pending',
           komentar: '',
           selectedAction: '',
@@ -84,6 +87,7 @@ export default {
           tanggal: '02/01/2024',
           jenis: 'Operasional',
           pelapor: 'Bendahara',
+          biaya: 'Rp.20.000',
           status: 'Setuju',
           komentar: 'Disetujui',
           selectedAction: 'Setuju',
@@ -111,63 +115,104 @@ export default {
 
 <style scoped>
 .kelola-laporan {
-  padding: 1rem;
+  padding: 0.2rem;
+  border-radius: 10px;
 }
 
 h1 {
   color: var(--green-kkc);
   font-weight: bold;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .laporan-container {
-  border: 2px solid var(--border-gray);
+  border: 2px solid var(--outline);
   border-radius: 8px;
   padding: 1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.03);
 }
 
 .laporan-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
-.laporan-table th,
+/* .laporan-table th, */
 .laporan-table td {
-  padding: 10px;
-  border: 1px solid #ccc;
-  text-align: center;
-  background-color: #fff;
+  padding: 10px 10px;
+  border-bottom: 2px solid #eee;
+  text-align: left;
+  font-size: 0.9em;
+  /* background-color: #fff; */
 }
 
 .laporan-table th {
-  background-color: var(--header-background);
-  font-weight: bold;
-  color: #333;
+  padding: 10px 10px;
+  background-color: var(--outline);
+  color: #444;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: left;
+  font-size: 0.9em;
+  /* letter-spacing: 1px; */
+}
+
+.laporan-table td {
+  vertical-align: middle;
+}
+
+.laporan-table tbody tr:hover {
+  background-color: #f2f2f2;
+  transition: background-color 0.3s ease;
+}
+
+.laporan-table th:first-child,
+.laporan-table td:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.laporan-table th:last-child,
+.laporan-table td:last-child {
+  border-radius: 0 8px 8px 0;
 }
 
 .gambar-laporan {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  background-color: #f0f0f0;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.gambar-laporan:hover {
+  transform: scale(1.05);
 }
 
 select,
 input {
-  padding: 5px;
+  padding: 8px;
   border-radius: 5px;
   border: 1px solid #ccc;
   width: 100%;
+  margin-bottom: 1rem;
+  font-size: 14px;
 }
 
 .save-btn {
-  padding: 5px 10px;
-  background-color: #007bff;
+  margin-top: -0.4rem;
+  padding: 8px 15px;
+  background-color: var(--blue-coe);
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .save-btn:hover {
@@ -175,28 +220,41 @@ input {
 }
 
 .pending {
-  color: orange;
+  color: #ff9800;
 }
 
 .approved {
-  color: green;
+  color: #4caf50;
 }
 
 .rejected {
-  color: red;
+  color: #f44336;
 }
 
 .status-btn {
-  padding: 5px 10px;
+  padding: 8px 15px;
   border-radius: 5px;
+  font-size: 13px;
   color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .status-btn.approved {
-  background-color: green;
+  background-color: #4caf50;
 }
 
 .status-btn.rejected {
-  background-color: red;
+  background-color: #f44336;
+}
+
+.status-btn.approved:hover {
+  background-color: #388e3c;
+}
+
+.status-btn.rejected:hover {
+  background-color: #d32f2f;
 }
 </style>
+

@@ -12,23 +12,24 @@
           <h2>Daftar</h2>
         </section>
         <div class="input-container name">
-          <input v-model="username" id="username" name="username" type="text" placeholder="Username" />
+          <input v-model="username" id="username" name="username" type="text" placeholder="Username" required />
         </div>
         <div class="input-container name">
-          <input v-model="nama" id="nama" name="nama" type="text" placeholder="Nama" />
+          <input v-model="name" id="nama" name="name" type="text" placeholder="Nama" required />
         </div>
         <div class="input-container role">
-          <select v-model="role" id="role" name="role">
+          <select v-model="role" id="role" name="role" required>
             <option value="" disabled selected>Role</option>
             <option value="ADMIN">Admin</option>
-            <option value="USER">User</option>
+            <!-- <option value="USER">User</option> -->
+            <option value="BENDAHARA">Bendahara</option>
           </select>
         </div>
         <div class="input-container password">
-          <input v-model="password" id="password" name="password" type="password" placeholder="Password" />
+          <input v-model="password" id="password" name="password" type="password" placeholder="Password" required/>
         </div>
         <div class="input-container password">
-          <input v-model="confirmPassword" id="confirm_password" name="confirm_password" type="password" placeholder="Confirm Password" />
+          <input v-model="confirmPassword" id="confirm_password" name="confirm_password" type="password" placeholder="Confirm Password" required />
         </div>
         <button class="signup-btn" type="submit">Daftar</button>
         <!-- Gambar di pojok kiri bawah -->
@@ -46,21 +47,21 @@ export default {
   data() {
     return {
       username: '',
-      nama: '',
+      name: '',
       role: '',
       password: '',
-      confirmPassword: ''
+      // confirmPassword: ''
     };
   },
   methods: {
     async registerUser() {
       try {
-        const response = await axios.post('http://localhost:5000/users', {
+        const response = await axios.post('http://localhost:3000/api/auth/register', {
         username: this.username,
-        nama: this.nama,
+        name: this.name,
         role: this.role,
         password: this.password,
-        confPassword: this.confirmPassword
+        // confPassword: this.confirmPassword
 });
 
         alert(response.data.msg); // Tampilkan pesan jika registrasi berhasil

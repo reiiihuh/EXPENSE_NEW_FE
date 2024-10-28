@@ -1,10 +1,10 @@
 <template>
-    <router-link to="/AccManager" class="card">
+    <router-link to="/AddAccount" class="card">
       <div class="icon-container">
         <span class="material-icons">manage_accounts</span>
       </div>
       <div class="text-container">
-        <p>Kelola Akun Keuangan</p>
+        <p>Kelola Akun</p>
       </div>
     </router-link>
   </template>

@@ -18,9 +18,9 @@
           <i class="fa fa-eye-slash"></i>
         </div>
         <button class="signup-btn" type="submit">Login</button>
-        <div class="login-container">
+        <!-- <div class="login-container">
           <p>Belum punya akun? <router-link to="/Register"><strong> Daftar</strong></router-link></p>
-        </div>
+        </div> -->
         <!-- Gambar di pojok kiri bawah -->
         <img src="/src/assets/fitxcoe.jpg" class="imgbottom" alt="Logo Bawah" />
       </form>

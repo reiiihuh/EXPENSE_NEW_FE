@@ -7,6 +7,7 @@ import RegisView from '../views/Register.vue';
 import Settings from '../views/Settings.vue';
 import AccManager from '../views/AccManager.vue';
 import ReportManager from '../views/ReportManager.vue';
+import AddAccount from '../views/AddAccount.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -46,6 +47,10 @@ const router = createRouter({
     {
       path: '/ReportManager',
       component: ReportManager,
+    },
+    {
+      path: '/AddAccount',
+      component: AddAccount,
     },
   ],
 });

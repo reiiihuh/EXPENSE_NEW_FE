@@ -23,6 +23,6 @@ import ReportManagerCard from '../components/ReportManagerCard.vue';
  }
 
  .card{
-    padding: 1.4rem;
+    padding: 1.2rem;
  }
 </style>

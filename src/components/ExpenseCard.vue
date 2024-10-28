@@ -1,34 +1,56 @@
 <template>
-    <div class="card saldo-card">
-      <div class="card-header">
-        <span class="material-icons">shopping_cart_checkout</span><span class="text">Pengeluaran</span>
-        <select v-model="selectedFilter" @change="updateData">
-          <option value="today">Hari ini</option>
-          <option value="lastWeek">Minggu lalu</option>
-          <option value="lastMonth">Bulan lalu</option>
-        </select>
-      </div>
-      <div class="card-body">
-        <p>Rp. {{ saldo }}</p>
-      </div>
+  <div class="card saldo-card">
+    <div class="card-header">
+      <span class="material-icons">shopping_cart_checkout</span>
+      <span class="text">Pengeluaran</span>
+      <select v-model="selectedFilter" @change="updateData">
+        <option value="all">Semua</option> <!-- Tambahkan opsi Semua -->
+        <option value="today">Hari ini</option>
+        <option value="lastWeek">Minggu lalu</option>
+        <option value="lastMonth">Bulan lalu</option>
+      </select>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        saldo: 0,
-        selectedFilter: "today",
-      };
+    <div class="card-body">
+      <p>{{ formatRupiah(saldo) }}</p> <!-- Format saldo sebagai Rupiah -->
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      saldo: 0, // Inisialisasi saldo dengan 0
+      selectedFilter: "all", // Default filter: Semua
+    };
+  },
+  methods: {
+    async updateData() {
+      try {
+        const response = await axios.get("http://localhost:5000/expenses/total", {
+          params: { filter: this.selectedFilter }, // Kirim filter ke API
+        });
+        this.saldo = response.data.total; // Update saldo dengan total dari API
+      } catch (error) {
+        console.error("Error fetching total expenses:", error);
+        alert("Gagal mengambil data total pengeluaran.");
+      }
     },
-    methods: {
-      updateData() {
-        // Logic untuk memperbarui saldo berdasarkan selectedFilter
-      },
+    formatRupiah(value) {
+      // Fungsi untuk memformat angka ke dalam Rupiah
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      }).format(value);
     },
-  };
-  </script>
+  },
+  mounted() {
+    this.updateData(); // Panggil updateData ketika komponen di-mount
+  },
+};
+</script>
   
   <style scoped lang="scss">
     .saldo-card {

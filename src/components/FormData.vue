@@ -1,95 +1,119 @@
 <template>
-    <div class="pencatatan-pengeluaran">
-      <!-- <h1>Pencatatan Pengeluaran</h1> -->
-      
-      <div class="form-container">
-        <!-- Box untuk input foto -->
-        <div class="photo-box">
-          <div class="photo-placeholder">
-            <span class="material-icons">add_photo_alternate</span>
-            <p>Tambah Foto</p>
-          </div>
-          <span class="material-icons delete-icon" @click="deletePhoto">delete</span>
+  <div class="pencatatan-pengeluaran">
+    <div class="form-container">
+      <!-- Box untuk input foto
+      <div class="photo-box"> -->
+        <!-- Input file hidden, trigger with photo box click -->
+        <!-- <input type="file" ref="photoInput" @change="handlePhotoUpload" accept="image/*" style="display:none;" />
+        <div class="photo-placeholder" @click="triggerPhotoInput">
+          <span class="material-icons">add_photo_alternate</span>
+          <p v-if="!photoPreview">Tambah Foto</p> -->
+          <!-- Show preview if photo is selected -->
+          <!-- <img v-if="photoPreview" :src="photoPreview" class="photo-preview" />
         </div>
-        
-        <!-- Form input -->
-        <div class="form-inputs">
-          <input type="text" placeholder="Judul" v-model="formData.title" />
-          <input type="date" placeholder="Tanggal" v-model="formData.date" />
-          <select v-model="formData.type">
-            <option value="" disabled selected>Jenis</option>
-            <option value="operasional">Operasional</option>
-            <option value="non-operasional">Non-Operasional</option>
-          </select>
-          <select v-model="formData.category">
-            <option value="" disabled selected>Kategori</option>
-            <option value="pribadi">Pribadi</option>
-            <option value="listrik">Listrik</option>
-            <option value="air">Air</option>
-          </select>
-          <!-- <input type="text" placeholder="Nama Pelapor" v-model="formData.reporterName" /> -->
-          <!-- <select v-model="formData.role">
-            <option value="" disabled selected>Role</option>
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
-          </select> -->
-          <input type="text" placeholder="Biaya" v-model="formData.cost" />
-        </div>
-      </div>
-      <div class="description-container">
-      <textarea
-        v-model="description"
-        @input="updateCharCount"
-        placeholder="Deskripsi"
-        maxlength="500"
-      ></textarea>
-    <div class="char-count">{{ charCount }} karakter tersisa</div>
-      </div>
-      <div class="form-actions">
-        <button class="btn-cancel" @click="cancel">Cancel</button>
-        <button class="btn-save" @click="save">Simpan</button>
+      <div class="imgformat"> *jpg,jpeg,png <br>*max size 2mb</div>
+        <span v-if="photoPreview" class="material-icons delete-icon" @click="deletePhoto">delete</span>
+      </div> -->
+
+      <!-- Form input -->
+      <div class="form-inputs">
+        <input type="text" placeholder="Judul" v-model="formData.title" />
+        <input type="date" placeholder="Tanggal" v-model="formData.date" />
+        <select v-model="formData.type">
+          <option value="" disabled selected>Jenis</option>
+          <option value="OPERASIONAL">Operasional</option>
+          <option value="NON-OPERASIONAL">Non-Operasional</option>
+          <option value="PRIVE">Prive</option>
+        </select>
+        <select v-model="formData.category">
+          <option value="" disabled selected>Kategori</option>
+          <option value="PRIBADI">Pribadi</option>
+          <option value="LISTRIK">Listrik</option>
+          <option value="AIR">Air</option>
+        </select>
+        <input type="text" placeholder="Biaya" v-model="formData.cost" />
       </div>
     </div>
-    
-  </template>
-  
+
+  <!-- Deskripsi -->
+  <div class="description-container">
+    <textarea
+      v-model="formData.description"
+      @input="updateCharCount"
+      placeholder="Deskripsi"
+      maxlength="500"
+    ></textarea>
+    <div class="char-count">{{ charCount }} karakter tersisa</div>
+  </div>
+
+    <!-- Tombol Aksi -->
+    <div class="form-actions">
+      <button class="btn-cancel" @click="cancel">Cancel</button>
+      <button class="btn-save" @click="save">Simpan</button>
+    </div>
+  </div>
+</template>
+
 <script setup>
-  import { reactive } from 'vue';
-  
-  const formData = reactive({
+import { ref } from 'vue';
+import axios from 'axios'; // Import Axios
+import { useRouter } from 'vue-router'; // Import useRouter
+
+// Form data untuk input pengeluaran
+const formData = ref({
+  title: '',
+  date: '',
+  cost: 0,
+  type: '',
+  category: '',
+  description: '',
+});
+
+// Char count untuk deskripsi
+const charCount = ref(500);
+
+// Gunakan useRouter untuk akses router
+const router = useRouter();
+
+// Fungsi untuk update jumlah karakter tersisa
+const updateCharCount = () => {
+  charCount.value = 500 - formData.value.description.length;
+};
+
+// Fungsi untuk menyimpan data pengeluaran
+const save = async () => {
+  try {
+    const response = await axios.post('http://localhost:5000/expenses', {
+      title: formData.value.title,
+      date: formData.value.date,
+      cost: formData.value.cost,
+      type: formData.value.type,
+      category: formData.value.category,
+      description: formData.value.description,
+    });
+
+    alert(response.data.msg); // Tampilkan pesan jika pencatatan berhasil
+    // Arahkan ke halaman Home setelah berhasil simpan
+    router.push('/Home');
+  } catch (error) {
+    console.error(error);
+    alert('Terjadi kesalahan saat pencatatan'); // Tampilkan pesan jika terjadi error
+  }
+};
+
+// Fungsi untuk membatalkan input
+const cancel = () => {
+  formData.value = {
     title: '',
     date: '',
+    cost: 0,
     type: '',
     category: '',
-    reporterName: '',
-    role: '',
-    cost: ''
-  });
-  
-  function deletePhoto() {
-    console.log('Foto dihapus');
-  }
-  
-  function cancel() {
-    console.log('Input dibatalkan');
-  }
-  
-  function save() {
-    console.log('Data disimpan', formData);
-  }
-  
-  // hitung sisa karakter
-  import { ref } from 'vue';
-
-  const description = ref('');
-  const maxChars = 500;
-  const charCount = ref(maxChars);
-
-  const updateCharCount = () => {
-    charCount.value = maxChars - description.value.length;
+    description: '',
   };
-
+};
 </script>
+
   
   <style scoped lang="scss">
   .pencatatan-pengeluaran {
@@ -98,6 +122,12 @@
     h1 {
       color: var(--green-kkc);
       font-weight: 700;
+    }
+
+    .imgformat{
+      font-size: 0.8rem;
+      color: #6b7280;
+      font-style: italic;
     }
   
     .form-container {
@@ -119,6 +149,13 @@
         .photo-placeholder {
           text-align: center;
           color: var(--inactive);
+        
+        .photo-preview {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        }
+        
           
           .material-icons {
             font-size: 2rem;
@@ -182,6 +219,7 @@
     }
     .description-container {
     position: relative;
+    margin-top: 150px;
     
     textarea {
       width: 19rem;
